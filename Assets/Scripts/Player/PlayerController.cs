@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    // [SerializeField] MoveSettings _settings = null;
 
-    // TODO: fix player being able to slow down fall
     // TODO: add different gravity when player is falling
+    // TODO: velocity is local to player
 
     [SerializeField] Camera _playerCamera;
     CharacterController _controller;
@@ -56,11 +55,11 @@ public class PlayerController : MonoBehaviour
         // if (_isDashing) return;
         DefaultMovement();
 
-        if (_isSprinting && _isPressingMovement) {
-            _playerCamera.fieldOfView = Mathf.Lerp(_playerCamera.fieldOfView, sprintFOV, 0.03f);
-        } else {
-            _playerCamera.fieldOfView = Mathf.Lerp(_playerCamera.fieldOfView, defaultFOV, 0.03f);
-        }
+        // if (_isSprinting && _isPressingMovement) {
+        //     _playerCamera.fieldOfView = Mathf.Lerp(_playerCamera.fieldOfView, sprintFOV, 0.03f);
+        // } else {
+        //     _playerCamera.fieldOfView = Mathf.Lerp(_playerCamera.fieldOfView, defaultFOV, 0.03f);
+        // }
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit)
@@ -78,7 +77,8 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        Vector3 worldVelocity = transform.TransformDirection(_velocity);
+        // Vector3 worldVelocity = transform.TransformDirection(_velocity);
+        Vector3 worldVelocity = _velocity;
 
         if (_isDashing) {
 
@@ -119,6 +119,8 @@ public class PlayerController : MonoBehaviour
     void DefaultMovement()
     {
         Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
+        Vector3 forward = new Vector3(_playerCamera.transform.forward.x, 0f, _playerCamera.transform.forward.z);
+        Vector3 right = new Vector3(_playerCamera.transform.right.x, 0f, _playerCamera.transform.right.z);
 
         _isPressingMovement = input.magnitude > 0.1f;
         _isFalling = _velocity.y < 0f && !_controller.isGrounded;
@@ -132,7 +134,12 @@ public class PlayerController : MonoBehaviour
                 // check if wallNormal is horizontal enough to jump on
                 float slopeAngle = Vector3.Angle(_wallNormal, Vector3.up);
                 if (slopeAngle < 91f && slopeAngle > 60f) {
-                    _velocity += transform.InverseTransformDirection(_wallNormal) * 40f + Vector3.up * 15f; 
+
+                    // Vector3 wallNormal90 = Vector3.Cross(_wallNormal, Vector3.up);
+                    // _velocity = Vector3.Scale(_velocity , wallNormal90);
+
+                    // _velocity += transform.InverseTransformDirection(_wallNormal) * 40f + Vector3.up * 15f; 
+                    _velocity += _wallNormal * 40f + Vector3.up * 15f; 
                     _canWallJump = false;
                 }
             }
@@ -142,8 +149,12 @@ public class PlayerController : MonoBehaviour
 
             _velocity *= groundDrag;
 
-            _velocity.x += input.x * groundAcceleration;
-            _velocity.z += input.y * groundAcceleration;
+            Debug.Log(forward);
+
+            _velocity += input.y * forward * groundAcceleration;
+            _velocity += input.x * right * groundAcceleration;
+            // _velocity.x += input.x * groundAcceleration;
+            // _velocity.z += input.y * groundAcceleration;
             _velocity.y = -antiBump;
 
             // jump
@@ -153,8 +164,10 @@ public class PlayerController : MonoBehaviour
             }
 
         } else {
-            _velocity.x += input.x * airAcceleration;
-            _velocity.z += input.y * airAcceleration;
+            // _velocity.x += input.x * airAcceleration;
+            // _velocity.z += input.y * airAcceleration;
+            _velocity += input.y * forward * airAcceleration;
+            _velocity += input.x * right * airAcceleration;
 
             // reduce impact of gravity if pressing space
             if (!_isFalling && Input.GetKey(KeyCode.Space)) {
