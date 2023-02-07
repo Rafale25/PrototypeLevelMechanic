@@ -55,11 +55,11 @@ public class PlayerController : MonoBehaviour
         // if (_isDashing) return;
         DefaultMovement();
 
-        // if (_isSprinting && _isPressingMovement) {
-        //     _playerCamera.fieldOfView = Mathf.Lerp(_playerCamera.fieldOfView, sprintFOV, 0.03f);
-        // } else {
-        //     _playerCamera.fieldOfView = Mathf.Lerp(_playerCamera.fieldOfView, defaultFOV, 0.03f);
-        // }
+        if (_isSprinting && _isPressingMovement) {
+            _playerCamera.fieldOfView = Mathf.Lerp(_playerCamera.fieldOfView, sprintFOV, 0.03f);
+        } else {
+            _playerCamera.fieldOfView = Mathf.Lerp(_playerCamera.fieldOfView, defaultFOV, 0.03f);
+        }
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit)
