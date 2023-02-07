@@ -16,13 +16,16 @@ public class BoidManager : MonoBehaviour
     [Range(0f, 5f)]
     public float viewDistance = 3f;
 
+    [Range(0f, 50f)]
+    public float arenaRadius = 6f;
+    
     public Boid boidPrefab;
     private List<Boid> boids;
     private int boidCount = 80;
     private float speed = 5f;
     private float spawnRadius = 5f;
-    private float arenaRadius = 6f;
-
+    
+ 
     void OnDrawGizmos() {
         Gizmos.color = Color.white;
         Gizmos.DrawWireSphere(transform.position, arenaRadius);
@@ -79,9 +82,11 @@ public class BoidManager : MonoBehaviour
                 newVelocity += -(newPosition - averagePosition) * cohesionFactor;
             }
 
-            if (newPosition.magnitude > arenaRadius) {
+            // distance limit
+            float df = (newPosition - this.transform.position).magnitude - arenaRadius;
+            if (df > 0f) {
                 Vector3 to_center = (this.transform.position - newPosition).normalized;
-                newVelocity += to_center * 0.3f;
+                newVelocity += to_center * (df * 0.1f);
             }
 
             me.transform.position = newPosition;
