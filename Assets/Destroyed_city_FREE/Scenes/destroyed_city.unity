@@ -7550,7 +7550,9 @@ MonoBehaviour:
   breakBeforeColorGrading: 0
   m_BeforeTransparentBundles: []
   m_BeforeStackBundles: []
-  m_AfterStackBundles: []
+  m_AfterStackBundles:
+  - assemblyQualifiedName: ColorCompression, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
 --- !u!4 &1776612620 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3908862774300192529, guid: 70f8d1ef1b2888f49bab46a24b12d720, type: 3}
