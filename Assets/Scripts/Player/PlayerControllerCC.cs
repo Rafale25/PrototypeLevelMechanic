@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerControllerCC : MonoBehaviour
 {
 
     // TODO: add different gravity when player is falling
@@ -62,16 +62,23 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // if (!_isGrapplin && Input.GetMouseButtonDown(0))
         if (Input.GetMouseButtonDown(0))
         {
-            RaycastHit hit;
-            if (Physics.Raycast(_playerCamera.transform.position, _playerCamera.transform.forward, out hit, 500f))
+            if (_isGrapplin)
             {
-                _isGrapplin = true;
-                _grapplinPoint = hit.point;
-                _grapplinLength = hit.distance;
+                _isGrapplin = false;
             }
+            else 
+            {
+                RaycastHit hit;
+                if (Physics.Raycast(_playerCamera.transform.position, _playerCamera.transform.forward, out hit, 500f))
+                {
+                    _isGrapplin = true;
+                    _grapplinPoint = hit.point;
+                    _grapplinLength = hit.distance;
+                }
+            }
+
         }
 
         if (_isGrapplin) {
@@ -196,7 +203,6 @@ public class PlayerController : MonoBehaviour
             } else {
                 _velocity.y -= gravityNormal * Time.fixedDeltaTime;
             }
-
         }
 
         // grapplin
