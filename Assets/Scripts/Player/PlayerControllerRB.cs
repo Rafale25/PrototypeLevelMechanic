@@ -20,14 +20,13 @@ public class PlayerControllerRB : MonoBehaviour
 
     float _walkSpeed = 120f;
     float _sprintSpeed = 150f;
-    // const float _airSpeedLimit = 20f;
 
     float _groundDrag = 0.8f; // only applied when player is not moving
-    float _airDragHorizontal = 0.9f;
-    float _airDragVertical = 1f; 
-    
-    // const float _groundAcceleration = 150f;
-    // const float _airAcceleration = 25f;
+    float _airDragHorizontal = 0.993f;
+    float _airDragVertical = 0.999f; 
+
+    const float _groundAcceleration = 1f;
+    const float _airAcceleration = 0.18f;
 
     float jumpForce = 5f;
     float gravityNormal = 30f;
@@ -44,11 +43,12 @@ public class PlayerControllerRB : MonoBehaviour
     bool _isAgainstWall = false;
     Vector3 _wallNormal;
 
-
     // grapplin
     public bool _isGrapplin = false;
     public Vector3 _grapplinPoint;
     public float _grapplinLength;
+
+    // GameObject grapplinObject;
 
     void OnDrawGizmos()
     {
@@ -80,11 +80,9 @@ public class PlayerControllerRB : MonoBehaviour
 
         updateStates();
 
-        if (_isSprinting) {
-            _moveDirection *= _sprintSpeed;
-        } else {
-            _moveDirection *= _walkSpeed;
-        }
+        float speed = _isSprinting ? _sprintSpeed : _walkSpeed;
+        float acceleration = _isGrounded ? _groundAcceleration : _airAcceleration;
+        _moveDirection *= speed * acceleration;
 
         if (Input.GetButtonDown("Jump") && _isGrounded)
         {
@@ -107,11 +105,13 @@ public class PlayerControllerRB : MonoBehaviour
             else 
             {
                 RaycastHit hit;
-                if (Physics.Raycast(_playerCamera.transform.position, _playerCamera.transform.forward, out hit, 500f))
+                if (Physics.Raycast(_playerCamera.transform.position, _playerCamera.transform.forward, out hit, 120f))
                 {
                     _isGrapplin = true;
                     _grapplinPoint = hit.point;
                     _grapplinLength = hit.distance;
+
+                    StartCoroutine(GrapplingAcceleration());
                 }
             }
         }
@@ -121,6 +121,20 @@ public class PlayerControllerRB : MonoBehaviour
         }
 
 
+    }
+
+    IEnumerator GrapplingAcceleration()
+    {
+        int frames = 12;
+
+        while (frames > 0) {
+            // Debug.Log(frames);
+            Vector3 dirGrapplin = (transform.position - _grapplinPoint).normalized;
+            _rb.AddForce(-dirGrapplin * 140f, ForceMode.Acceleration);
+
+            yield return new WaitForFixedUpdate();
+            frames -= 1;
+        }
     }
 
     void updateStates()
@@ -141,11 +155,14 @@ public class PlayerControllerRB : MonoBehaviour
     {
         _rb.AddForce(_moveDirection * Time.fixedDeltaTime, ForceMode.VelocityChange);
 
+        Debug.Log(_grapplinLength);
+
         Vector3 drag;
         if (_isGrounded) {
             drag = new Vector3(_groundDrag, _groundDrag, _groundDrag);
         } else {
             drag = new Vector3(_airDragHorizontal, _airDragVertical, _airDragHorizontal);
+            // drag = Vector3.one;
         }
         // float drag = _isGrounded ? _groundDragMultiplier : _airDragMultiplier;
         _rb.velocity = new Vector3(_rb.velocity.x * drag.x, _rb.velocity.y * drag.y, _rb.velocity.z * drag.z);
@@ -162,11 +179,17 @@ public class PlayerControllerRB : MonoBehaviour
             float distance_grapplinPoint = Vector3.Distance(transform.position, _grapplinPoint);
             Vector3 dirGrapplin = (transform.position - _grapplinPoint).normalized; 
 
-            if (distance_grapplinPoint > _grapplinLength) {
+            if (distance_grapplinPoint < _grapplinLength) {
+                _grapplinLength = distance_grapplinPoint;
+            } else {
                 transform.position = _grapplinPoint + dirGrapplin * _grapplinLength;
 
-                Vector3 badDir = (-dirGrapplin) * Vector3.Dot(_rb.velocity, -dirGrapplin);
-                _rb.velocity -= badDir; // clamp velocity to normal's plane 
+
+                float delta = Vector3.Dot(_rb.velocity, -dirGrapplin);
+                if (delta < 0f) {
+                    Vector3 badDir = (-dirGrapplin) * delta;
+                    _rb.velocity -= badDir; // clamp velocity to normal's plane 
+                }
                 // _rb.velocity += _rb.velocity.normalized * badDir.magnitude;
             }
         }
