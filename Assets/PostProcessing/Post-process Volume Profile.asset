@@ -24,25 +24,25 @@ MonoBehaviour:
     value: {fileID: 0}
     defaultState: 1
   tonemapper:
-    overrideState: 1
-    value: 3
+    overrideState: 0
+    value: 0
   toneCurveToeStrength:
-    overrideState: 1
+    overrideState: 0
     value: 0.339
   toneCurveToeLength:
     overrideState: 1
     value: 0.36
   toneCurveShoulderStrength:
-    overrideState: 1
+    overrideState: 0
     value: 0.48
   toneCurveShoulderLength:
-    overrideState: 1
+    overrideState: 0
     value: 1.15
   toneCurveShoulderAngle:
     overrideState: 1
     value: 0.824
   toneCurveGamma:
-    overrideState: 1
+    overrideState: 0
     value: 1
   ldrLut:
     overrideState: 0
@@ -70,8 +70,8 @@ MonoBehaviour:
     overrideState: 0
     value: 0
   postExposure:
-    overrideState: 0
-    value: 1
+    overrideState: 1
+    value: 0.65
   contrast:
     overrideState: 0
     value: 0
@@ -1323,7 +1323,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1cb7e9e120078f43bce4f0b1be547a7, type: 3}
   m_Name: AmbientOcclusion
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   enabled:
     overrideState: 1
     value: 1
@@ -1360,6 +1360,25 @@ MonoBehaviour:
   quality:
     overrideState: 0
     value: 2
+--- !u!114 &-763574911232423876
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1841642446ad8e44982acb8d9ba8515b, type: 3}
+  m_Name: ColorCompression
+  m_EditorClassIdentifier: 
+  active: 1
+  enabled:
+    overrideState: 1
+    value: 1
+  blend:
+    overrideState: 0
+    value: 0.5
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1377,7 +1396,7 @@ MonoBehaviour:
   - {fileID: 8230014279777512882}
   - {fileID: -1372885793554593911}
   - {fileID: -5579840122283479155}
-  - {fileID: 1978205165085716509}
+  - {fileID: -763574911232423876}
 --- !u!114 &1978205165085716509
 MonoBehaviour:
   m_ObjectHideFlags: 3
