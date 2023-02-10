@@ -1974,14 +1974,6 @@ MonoBehaviour:
   _playerCamera: {fileID: 1912220875}
   _groundChecker: {fileID: 1977611738}
   _isGrounded: 1
-  _walkSpeed: 50
-  _sprintSpeed: 100
-  _groundDrag: 0.7
-  _airDragHorizontal: 0.9
-  _airDragVertical: 0.95
-  jumpForce: 4
-  gravityNormal: 30
-  gravityHold: 20
   _isGrapplin: 0
   _grapplinPoint: {x: 0, y: 0, z: 0}
   _grapplinLength: 0
