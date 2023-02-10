@@ -18,20 +18,20 @@ public class PlayerControllerRB : MonoBehaviour
 
     Vector3 _moveDirection;
 
-    public float _walkSpeed = 120f;
-    public float _sprintSpeed = 150f;
+    float _walkSpeed = 120f;
+    float _sprintSpeed = 150f;
     // const float _airSpeedLimit = 20f;
 
-    public float _groundDrag = 0.8f; // only applied when player is not moving
-    public float _airDragHorizontal = 0.9f;
-    public float _airDragVertical = 1f; 
+    float _groundDrag = 0.8f; // only applied when player is not moving
+    float _airDragHorizontal = 0.9f;
+    float _airDragVertical = 1f; 
     
     // const float _groundAcceleration = 150f;
     // const float _airAcceleration = 25f;
 
-    public float jumpForce = 5f;
-    public float gravityNormal = 30f;
-    public float gravityHold = 20f;
+    float jumpForce = 5f;
+    float gravityNormal = 30f;
+    float gravityHold = 20f;
 
     float defaultFOV;
     float sprintFOV;
@@ -61,7 +61,7 @@ public class PlayerControllerRB : MonoBehaviour
     void Start()
     {
         _rb = GetComponent<Rigidbody>();
-        _rb.drag = 0f;
+        _rb.drag = 0f; // doing the drag manually
 
         defaultFOV = _playerCamera.fieldOfView;
         sprintFOV = _playerCamera.fieldOfView * 1.1f;
@@ -96,6 +96,31 @@ public class PlayerControllerRB : MonoBehaviour
         } else {
             _playerCamera.fieldOfView = Mathf.Lerp(_playerCamera.fieldOfView, defaultFOV, Easing.easeOutCubic(5f * Time.deltaTime));
         }
+
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (_isGrapplin)
+            {
+                _isGrapplin = false;
+            }
+            else 
+            {
+                RaycastHit hit;
+                if (Physics.Raycast(_playerCamera.transform.position, _playerCamera.transform.forward, out hit, 500f))
+                {
+                    _isGrapplin = true;
+                    _grapplinPoint = hit.point;
+                    _grapplinLength = hit.distance;
+                }
+            }
+        }
+
+        if (_isGrapplin) {
+            _grapplinLength += Input.mouseScrollDelta.y;
+        }
+
+
     }
 
     void updateStates()
@@ -132,6 +157,19 @@ public class PlayerControllerRB : MonoBehaviour
         // } else {
         //     _rb.AddForce(Vector3.down * gravityHold * Time.fixedDeltaTime, ForceMode.VelocityChange);
         // }
+
+        if (_isGrapplin) {
+            float distance_grapplinPoint = Vector3.Distance(transform.position, _grapplinPoint);
+            Vector3 dirGrapplin = (transform.position - _grapplinPoint).normalized; 
+
+            if (distance_grapplinPoint > _grapplinLength) {
+                transform.position = _grapplinPoint + dirGrapplin * _grapplinLength;
+
+                Vector3 badDir = (-dirGrapplin) * Vector3.Dot(_rb.velocity, -dirGrapplin);
+                _rb.velocity -= badDir; // clamp velocity to normal's plane 
+                // _rb.velocity += _rb.velocity.normalized * badDir.magnitude;
+            }
+        }
 
     }
 
