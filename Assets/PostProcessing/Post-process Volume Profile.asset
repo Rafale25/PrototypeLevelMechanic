@@ -18,7 +18,7 @@ MonoBehaviour:
     value: 1
   intensity:
     overrideState: 1
-    value: 23.93
+    value: 12.5
   threshold:
     overrideState: 0
     value: 1
@@ -1423,9 +1423,9 @@ MonoBehaviour:
   enabled:
     overrideState: 1
     value: 1
-  blend:
-    overrideState: 0
-    value: 0.5
+  palette:
+    overrideState: 1
+    value: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0

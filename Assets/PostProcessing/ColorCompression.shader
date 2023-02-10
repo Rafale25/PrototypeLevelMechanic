@@ -5,23 +5,21 @@ Shader "Hidden/Custom/ColorCompression"
         #include "Packages/com.unity.postprocessing/PostProcessing/Shaders/StdLib.hlsl"
         TEXTURE2D_SAMPLER2D(_MainTex, sampler_MainTex);
 
-        float _Blend;
+        float _Palette;
 
-        static const float steps = 12.0;
+        static const float palette_size = 9;
 
-        // static const float palette_size = 9;
-
-        // static const float3 palette[palette_size] = {
-        //     float3(0.055, 0.047, 0.001),
-        //     float3(0.314, 0.251, 0.027),
-        //     float3(0.380, 0.345, 0.051),
-        //     float3(0.475, 0.475, 0.264),
-        //     float3(0.513, 0.576, 0.302),
-        //     float3(0.541, 0.749, 0.420),
-        //     float3(0.584, 0.878, 0.592),
-        //     float3(0.635, 0.984, 0.823),
-        //     float3(0.800, 1.000, 0.900),
-        // };
+        static const float3 palette[palette_size] = {
+            float3(0.055, 0.047, 0.001),
+            float3(0.314, 0.251, 0.027),
+            float3(0.380, 0.345, 0.051),
+            float3(0.475, 0.475, 0.264),
+            float3(0.513, 0.576, 0.302),
+            float3(0.541, 0.749, 0.420),
+            float3(0.584, 0.878, 0.592),
+            float3(0.635, 0.984, 0.823),
+            float3(0.800, 1.000, 0.900),
+        };
 
         // static const float palette_size = 11;
 
@@ -52,16 +50,14 @@ Shader "Hidden/Custom/ColorCompression"
             float4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord);
 
             float luminance = dot(color.rgb, float3(0.2126729, 0.7151522, 0.0721750));
-            // color.rgb = luminance.xxx;
-            color.rgb = luminance * float3(234.0/255.0, 140.0/255.0, 85.0/255.0);
 
-            // float intensity = float(int((1.0 - pow(1.0 - color.g, 3.0)) * steps)) / steps;
-            // color.rgb *= intensity;
-
-            // color.rgb = round(color.rgb * (palette_size - 1.0)) / (palette_size - 1.0);
-            // color.rgb = palette[int(color.r * (palette_size - 1.0))];
-
-            // color.rgb = lerp(color.rgb, luminance.xxx, _Blend.xxx);
+            if (_Palette == 0.0) {
+                color.rgb = luminance * float3(234.0/255.0, 140.0/255.0, 85.0/255.0);
+            } else {
+                color.rgb = clamp(luminance, 0.0, 1.0).xxx;
+                color.rgb = round(color.rgb * (palette_size - 1.0)) / (palette_size - 1.0);
+                color.rgb = palette[int(color.r * (palette_size - 1.0))];
+            }
 
             return color;
         }
