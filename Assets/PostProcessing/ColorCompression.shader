@@ -53,7 +53,7 @@ Shader "Hidden/Custom/ColorCompression"
 
             float luminance = dot(color.rgb, float3(0.2126729, 0.7151522, 0.0721750));
             // color.rgb = luminance.xxx;
-            color.rgb = (round(luminance * steps) / steps) * float3(234.0/255.0, 140.0/255.0, 85.0/255.0);
+            color.rgb = luminance * float3(234.0/255.0, 140.0/255.0, 85.0/255.0);
 
             // float intensity = float(int((1.0 - pow(1.0 - color.g, 3.0)) * steps)) / steps;
             // color.rgb *= intensity;
