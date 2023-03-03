@@ -7,6 +7,7 @@ public class PlayerControllerRB : MonoBehaviour
     // TODO: add different gravity when player is falling
 
     [SerializeField] Camera _playerCamera;
+    [SerializeField] LineRenderer _lineRenderer;
     Rigidbody _rb;
     public Transform _groundChecker;
 
@@ -101,6 +102,7 @@ public class PlayerControllerRB : MonoBehaviour
             if (_isGrapplin)
             {
                 _isGrapplin = false;
+                _lineRenderer.enabled = false;
             }
             else 
             {
@@ -113,11 +115,15 @@ public class PlayerControllerRB : MonoBehaviour
 
                     StartCoroutine(GrapplingAcceleration());
                 }
+                _lineRenderer.enabled = true;
             }
         }
 
         if (_isGrapplin) {
             _grapplinLength += Input.mouseScrollDelta.y;
+            // _lineRenderer.SetPosition(0, _playerCamera.transform.position + _playerCamera.transform.forward * 0.2f + new Vector3(.0f, -.3f, .0f));
+            _lineRenderer.SetPosition(0, _playerCamera.transform.position );
+            _lineRenderer.SetPosition(1, _grapplinPoint);
         }
 
 
