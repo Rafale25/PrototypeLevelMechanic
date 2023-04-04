@@ -7,7 +7,8 @@ public class PlayerControllerRB : MonoBehaviour
     // TODO: add different gravity when player is falling
 
     [SerializeField] Camera _playerCamera;
-    [SerializeField] LineRenderer _lineRenderer;
+    // [SerializeField] LineRenderer _lineRenderer;
+    LineRenderer _lineRenderer;
     Rigidbody _rb;
     public Transform _groundChecker;
 
@@ -24,7 +25,7 @@ public class PlayerControllerRB : MonoBehaviour
 
     float _groundDrag = 0.8f; // only applied when player is not moving
     float _airDragHorizontal = 0.993f;
-    float _airDragVertical = 0.999f; 
+    float _airDragVertical = 0.999f;
 
     const float _groundAcceleration = 1f;
     const float _airAcceleration = 0.18f;
@@ -48,8 +49,7 @@ public class PlayerControllerRB : MonoBehaviour
     public bool _isGrapplin = false;
     public Vector3 _grapplinPoint;
     public float _grapplinLength;
-
-    // GameObject grapplinObject;
+    const float maxGrapplinLength = 175f;
 
     void OnDrawGizmos()
     {
@@ -66,6 +66,8 @@ public class PlayerControllerRB : MonoBehaviour
 
         defaultFOV = _playerCamera.fieldOfView;
         sprintFOV = _playerCamera.fieldOfView * 1.1f;
+
+        _lineRenderer = GetComponent<LineRenderer>();
     }
 
     void Update()
@@ -104,10 +106,10 @@ public class PlayerControllerRB : MonoBehaviour
                 _isGrapplin = false;
                 _lineRenderer.enabled = false;
             }
-            else 
+            else
             {
                 RaycastHit hit;
-                if (Physics.Raycast(_playerCamera.transform.position, _playerCamera.transform.forward, out hit, 120f))
+                if (Physics.Raycast(_playerCamera.transform.position, _playerCamera.transform.forward, out hit, maxGrapplinLength))
                 {
                     _isGrapplin = true;
                     _grapplinPoint = hit.point;
@@ -122,7 +124,7 @@ public class PlayerControllerRB : MonoBehaviour
         if (_isGrapplin) {
             _grapplinLength += Input.mouseScrollDelta.y;
             // _lineRenderer.SetPosition(0, _playerCamera.transform.position + _playerCamera.transform.forward * 0.2f + new Vector3(.0f, -.3f, .0f));
-            _lineRenderer.SetPosition(0, _playerCamera.transform.position );
+            _lineRenderer.SetPosition(0, _playerCamera.transform.position + _playerCamera.transform.right*0.5f );
             _lineRenderer.SetPosition(1, _grapplinPoint);
         }
 
@@ -146,9 +148,9 @@ public class PlayerControllerRB : MonoBehaviour
     void updateStates()
     {
         _isPressingMovement = _inputs.magnitude > 0.1f;
-        
+
         _isFalling = _rb.velocity.y < 0f && !_isGrounded;
-        
+
         if (_isGrounded) {
             _canWallJump = true;
         }
@@ -161,7 +163,7 @@ public class PlayerControllerRB : MonoBehaviour
     {
         _rb.AddForce(_moveDirection * Time.fixedDeltaTime, ForceMode.VelocityChange);
 
-        Debug.Log(_grapplinLength);
+        // Debug.Log(_grapplinLength);
 
         Vector3 drag;
         if (_isGrounded) {
@@ -183,7 +185,7 @@ public class PlayerControllerRB : MonoBehaviour
 
         if (_isGrapplin) {
             float distance_grapplinPoint = Vector3.Distance(transform.position, _grapplinPoint);
-            Vector3 dirGrapplin = (transform.position - _grapplinPoint).normalized; 
+            Vector3 dirGrapplin = (transform.position - _grapplinPoint).normalized;
 
             if (distance_grapplinPoint < _grapplinLength) {
                 _grapplinLength = distance_grapplinPoint;
@@ -194,7 +196,7 @@ public class PlayerControllerRB : MonoBehaviour
                 float delta = Vector3.Dot(_rb.velocity, -dirGrapplin);
                 if (delta < 0f) {
                     Vector3 badDir = (-dirGrapplin) * delta;
-                    _rb.velocity -= badDir; // clamp velocity to normal's plane 
+                    _rb.velocity -= badDir; // clamp velocity to normal's plane
                 }
                 // _rb.velocity += _rb.velocity.normalized * badDir.magnitude;
             }
